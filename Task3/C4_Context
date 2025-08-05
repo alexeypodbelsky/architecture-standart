@@ -1,0 +1,36 @@
+@startuml
+!theme black-knight
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Context.puml
+
+left to right direction
+
+Person(customer, "Клиент", "Физическое лицо, желающее открыть депозит")
+
+System_Boundary(c1, "Банк 'Стандарт'") {
+
+    Person(back_office_user, "Специалист Бэк-офиса")
+    Person(call_center_user, "Менеджер колл-центрара")
+    Person(front_office_user, "Менеджер фронт_офиса")
+
+    System(website, "Веб-сайт банка", "Подача заявки на депозит для новых клиентов")
+    System(internet_bank, "Интернет-банк", "Подача заявки на депозит для существующих клиентов")
+    System(call_center_system, "Система колл-центра", "Обработка заявок от новых клиентов, предложение специальных условий")
+    System(abs, "АБС Банка", "Автоматизированная банковская система: открытие депозита")
+    System(sms_gateway, "SMS Gateway", "Отправка SMS-уведомлений")
+}
+
+System_Ext(telecom_operator, "Телеком оператор", "Обработка запросов на отправку СМС")
+
+Rel(customer, website, "Просматривает список доступных депозитов с актуальными ставками. Подает заявку на депозит (номер телефона и Ф. И. О.)")
+Rel(customer, internet_bank, "Просматривает список депозитов и персонализированные ставки. Подает заявку (счёт, сумма). Вводит код из SMS")
+Rel(website, call_center_system, "Передает данные заявки (зашифровано)")
+Rel(internet_bank, abs, "Работа с зявками для АБС", "создание/отслеживание")
+Rel(internet_bank, sms_gateway, "Отправляет SMS для подтверждения операции отправки заявки")
+Rel(call_center_system, abs, "Работа с зявками для АБС", "создание/отслеживание")
+Rel(abs, sms_gateway, "Отправляет клиенту SMS после подтверждения размера ставки и открытия депозита")
+Rel(sms_gateway, telecom_operator, "Передача СМС")
+Rel(call_center_user, call_center_system, "Изучает заявку в системе кол-центра (в том числе после уведомления по статусу заявки от АБС)")
+Rel(front_office_user, abs, "Создает депозит")
+Rel(back_office_user, abs, "Обрабатывает обращения в АБС. устанавливает ставку")
+
+@enduml
