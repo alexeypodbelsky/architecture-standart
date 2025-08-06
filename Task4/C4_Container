@@ -1,0 +1,38 @@
+@startuml
+!theme black-knight
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+left to right direction
+
+System_Boundary(b1, "Банк 'Стандарт'") {
+
+    Person(back_office_user, "Специалист Бэк-офиса", "Обновляет информацию о ставках")
+
+    System_Boundary(b2, "Система колл-центра банка") {
+        Container(bank_call_center_system, "Система колл-центра Backend", "Java Spring Boot")
+
+    }
+
+    System_Boundary(b3, "Система управления ставками") {
+        Container(rates_management_frontend, "Фронтенд системы управления ставками", "React", "Предоставляет интерфейс для взаимодействия со ставками")
+        ContainerDb(rates_management_db, "База данных ставок", "MS SQL Server", "Хранит информацию о текущих ставках")
+        Container(rates_management_backend, "Backend системы управления ставками", "PHP", "Обрабатывает запросы, управляет данными и взаимодействует с SFTP")
+    }
+    
+
+    System_Boundary(b4, "SFTP сервер") {
+        Container(sftp_server, "SFTP сервер", "SFTP", "Обмен файлами между банком и партнерским колл-центром")
+    }
+}
+
+Person_Ext(partner_call_center_manager, "Менеджер партнерского колл-центра", "Предоставляет информацию о ставках клиентам")
+
+Rel(bank_call_center_system, rates_management_backend, "Запрашивает информацию о ставках", "REST")
+Rel(back_office_user, rates_management_frontend, "Обновляет информацию о ставках (Excel)")
+Rel(rates_management_frontend, rates_management_backend, "Сохраняет ставки", "REST")
+Rel(rates_management_backend, rates_management_db, "Сохраняет/Извлекает ставки", "SQL")
+Rel(rates_management_backend, sftp_server, "Выгружает файл с информацией о ставках", "SFTP")
+Rel(partner_call_center_manager, sftp_server, "Выгружает файл с информацией о ставках (Excel)", "SFTP")
+
+@enduml

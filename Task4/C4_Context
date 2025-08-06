@@ -1,0 +1,24 @@
+@startuml
+!theme black-knight
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Context.puml
+
+left to right direction
+
+System_Boundary(b1, "Банк 'Стандарт'") {
+    Person(bank_call_center_manager, "Менеджер колл-центра банка", "Принимает звонки клиентов и предоставляет информацию о ставках")
+    Person(back_office_user, "Специалист Бэк-офиса", "Обновляет информацию о ставках")
+
+    System(bank_call_center_system, "Система колл-центра банка", "Отображает информацию о ставках")
+    System(rates_management_system, "Система управления ставками", "Хранит и управляет информацией о текущих ставках")
+    System(sftp_server, "SFTP сервер", "Обмен файлами между банком и партнерским колл-центром")
+}
+
+Person_Ext(partner_call_center_manager, "Менеджер партнерского колл-центра", "Предоставляет информацию о ставках клиентам")
+
+Rel(bank_call_center_manager, bank_call_center_system, "Получает информацию о ставках")
+Rel(bank_call_center_system, rates_management_system, "Запрашивает информацию о ставках")
+Rel(back_office_user, rates_management_system, "Обновляет информацию о ставках")
+Rel(rates_management_system, sftp_server, "Выгружает файл с информацией о ставках")
+Rel(partner_call_center_manager, sftp_server, "Загружает файл с информацией о ставках (Excel)")
+
+@enduml
