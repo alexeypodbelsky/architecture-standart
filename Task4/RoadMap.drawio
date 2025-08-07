@@ -154,7 +154,7 @@
         <mxCell id="CMT7PubapjZ8zyZzlBPx-7" value="ADR2 -&amp;gt; все" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontSize=18;" vertex="1" parent="3D7FDG2aXA9G618_Kong-1">
           <mxGeometry x="-2790" y="-281" width="120" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="CMT7PubapjZ8zyZzlBPx-8" value="ADR2 -&amp;gt; T2" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontSize=18;" vertex="1" parent="3D7FDG2aXA9G618_Kong-1">
+        <mxCell id="CMT7PubapjZ8zyZzlBPx-8" value="ADR2 -&amp;gt; T20" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontSize=18;" vertex="1" parent="3D7FDG2aXA9G618_Kong-1">
           <mxGeometry x="-2790" y="-593.2" width="120" height="150" as="geometry" />
         </mxCell>
       </root>
