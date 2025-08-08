@@ -1,0 +1,75 @@
+@startuml
+!theme black-knight
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+
+left to right direction
+
+Person(customer, "Клиент", "Физическое лицо, желающий открыть депозит")
+
+Person(back_office_user, "Специалист Бэк-офиса")
+Person(call_center_user, "Менеджер колл-центрара")
+Person(front_office_user, "Менеджер фронт_офиса")
+
+
+' ** Website System and Containers **
+System_Boundary(web_boundary, "Веб-сайт банка") {
+    Container(website_backend, "Веб-сайт Backend", "PHP", "Обрабатывает запросы и предоставляет данные для веб-интерфейса.")
+    Container(website_web, "Веб-сайт Web Application", "React.js", "Предоставляет пользовательский интерфейс.")
+    Rel(website_web, website_backend, "Использует", "API (зашифровано)")
+}
+
+
+' ** Internet Bank System and Containers **
+System_Boundary(ib_boundary, "Интернет-банк") {
+    ContainerDb(internet_bank_db, "Интернет-банк Database", "MS SQL", "База данных для хранения данных интернет-банка")
+    Container(internet_bank_web, "Интернет-банк Web Application", "ASP.NET MVC 4.5", "Предоставляет веб-интерфейс и обрабатывает логику приложения.",)
+    Rel(internet_bank_web, internet_bank_db, "Читает/Записывает")
+}
+
+' ** Call Center System and Containers **
+System_Boundary(cc_boundary, "Система колл-центра") {
+    ContainerDb(call_center_db, "Система колл-центра Database", "PostgreSQL", "База данных для хранения данных системы колл-центра")
+    Container(call_center_backend, "Система колл-центра Backend", "Java Spring Boot", "API для веб-интерфейса")
+    Container(call_center_web, "Система колл-центра Web Application", "React.js", "Веб-интерфейс для менеджеров колл-центра")
+    Rel(call_center_web, call_center_backend, "Использует")
+    Rel(call_center_backend, call_center_db, "Читает/Записывает")
+}
+
+' ** ABS System and Containers **
+System_Boundary(abs_boundary, "АБС Банка") {
+    ContainerDb(abs_db, "АБС Database", "Oracle", "База данных для хранения данных АБС")
+    Container(abs_desktop, "АБС Desktop Client", "Delphi", "Десктопное приложение для специалистов банка")
+    Rel(abs_desktop, abs_db, "Читает/Записывает", "PL/SQL")
+}
+
+' ** SMS Gateway System and Containers **
+System_Boundary(sms_boundary, "SMS Gateway") {
+    Container(sms_gateway_app, "SMS Gateway Application", "Custom", "Приложение для отправки SMS-уведомлений")
+}
+
+System_Ext(telecom_operator, "Телеком оператор", "Обработка запросов на отправку СМС")
+
+' ** Orchestration Service **
+System_Boundary(orchestration_boundary, "Сервис оркестрации заявок") {
+    Container(orchestration_service, "Оркестратор заявок на депозиты", "Java Spring Boot", "Принимает заявки, сохраняет их и отправляет в АБС с контролем статуса")
+    ContainerDb(orchestration_db, "База данных заявок", "MS SQL", "Хранит заявки на депозиты и их статусы")
+    Rel(orchestration_service, orchestration_db, "Читает/Записывает")
+}
+
+
+Rel(customer, website_web, "Просматривает список доступных депозитов с актуальными ставками. Подает заявку на депозит (номер телефона и Ф.И.О.)")
+Rel(customer, internet_bank_web, "Просматривает список депозитов и персонализированные ставки. Подает заявку (счёт, сумма). Вводит код из SMS")
+Rel(website_backend, call_center_backend, "Передает данные заявки")
+
+Rel(internet_bank_web, orchestration_service, "Отправляет заявку на открытие депозита. Отслеживает статус", "REST")
+Rel(call_center_backend, orchestration_service, "Отправляет заявку на открытие депозита. Отслеживает статус", "REST")
+Rel(orchestration_service, abs_db, "Создает/отслеживает заявку (медленно и аккуратно)", "PL/SQL")
+
+Rel(internet_bank_web, sms_gateway_app, "Отправляет SMS для подтверждения операции отправки заявки")
+Rel(abs_desktop, sms_gateway_app, "Отправляет клиенту SMS после подтверждения размера ставки и открытия депозита")
+Rel(sms_gateway_app, telecom_operator, "Передача СМС")
+Rel(call_center_user, call_center_web, "Изучает заявку в системе кол-центра (в том числе после уведомления по статусу заявки от АБС)")
+Rel(front_office_user, abs_desktop, "Создает депозит")
+Rel(back_office_user, abs_desktop, "Обрабатывает обращения в АБС. устанавливает ставку")
+
+@enduml
